@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------
+  # 1. Relational Warehousing Layer (PostgreSQL)
+  # ----------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: automation_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secure_db_pass_2026
+      POSTGRES_DB: automation_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------
+  # 2. Asynchronous Message Broker Stack (Redis)
+  # ----------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: automation_redis_broker
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ----------------------------------------------------
+  # 3. Main Operational API Layer (FastAPI)
+  # ----------------------------------------------------
+  api:
+    build: .
+    container_name: automation_fastapi_server
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - shared_staging_volume:/tmp/automation_uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ----------------------------------------------------
+  # 4. Asynchronous Pipeline Worker Engine (Celery)
+  # ----------------------------------------------------
+  worker:
+    build: .
+    container_name: automation_celery_worker
+    restart: always
+    # Overwrite default execution CMD to run Celery instead of FastAPI
+    command: celery -A app.workers.celery_app.celery_app worker --loglevel=info --concurrency=4
+    env_file:
+      - .env
+    volumes:
+      - shared_staging_volume:/tmp/automation_uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data_volume:
+    driver: local
+  shared_staging_volume:
+    driver: local
+
