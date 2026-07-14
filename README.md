@@ -4,6 +4,7 @@ ENTERPRISE AI DATA AUTOMATION PIPELINE
 
 Building production endpoint for real-time document extraction and summarization
 Real-Time Production Architecture
+
 [Document Upload] ──► [FastAPI] ──► [Celery Queue (Redis)] ──► [Worker Component] │ ┌──────────────────────────────────────────────────────────────────┘ ▼ [Worker Multi-threading] ├──► AWS Textract (Form Extraction) ├──► Streaming Excel Parser (Pandas/OpenPyXL) ──► [Aggregator] ──► [OpenAI Stream] ──► [PostgreSQL] └──► Bright Data Scraper (Playwright)
 
 Production Implement Blueprint
