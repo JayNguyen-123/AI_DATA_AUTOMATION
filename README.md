@@ -8,7 +8,7 @@
 - Framework / runtime: FastAPI + Uvicorn; Celery workers for background processing
 - Notable libraries: FastAPI, SQLAlchemy, Celery, Playwright, OpenAI (plus pandas / openpyxl / boto3)
 
-# Stucture Tree View
+# Project Structure Tree View
 
 Dockerfile                 # production image (installs Playwright browsers)
 docker-compose.yml         # orchestration for app + workers/broker/db (present)
