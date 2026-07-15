@@ -40,8 +40,8 @@ Install Redis and Postgres locally or plan to use the docker-compose services.
 Obtain external creds: AWS (Textract), OpenAI API key, Bright Data proxy creds.
 A. Clone the repo
 
-git clone https://github.com/JayNguyen-123/AI_DATA_AUTOMATION.git
-cd AI_DATA_AUTOMATION
+  git clone https://github.com/JayNguyen-123/AI_DATA_AUTOMATION.git
+  cd AI_DATA_AUTOMATION
 
 B. Recommended: Run with Docker Compose (fast start)
 
